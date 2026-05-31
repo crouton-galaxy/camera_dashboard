@@ -416,7 +416,7 @@ export const METRICS = [
 ]
 
 // Group metrics for the dropdown
-export const METRIC_GROUPS = ['Coverage rate', 'Population served', 'Camera counts', 'Crash metrics', 'Socioeconomic', 'School & Safety']
+export const METRIC_GROUPS = ['Coverage rate', 'Population served', 'Camera counts', 'Crash metrics', 'Socioeconomic', 'Schools & Safety']
 
 export const CAMERA_TYPES = [
   { key: 'all',    label: 'All Types', metricKey: 'camerasPer1000',      resMetricKey: 'residentsPerCamera' },
