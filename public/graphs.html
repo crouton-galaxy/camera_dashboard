@@ -1,0 +1,332 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Victoria Speed Camera — Graphs</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,400&family=DM+Serif+Display:ital@0;1&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --ink:       #0d0f14;
+      --slate:     #1e2330;
+      --border:    rgba(255,255,255,0.08);
+      --text:      #c8c4bc;
+      --muted:     #6b7280;
+      --accent:    #e85d2b;
+      --highlight: #f0c040;
+      --paper:     #f5f3ee;
+    }
+
+    body {
+      background: var(--ink);
+      color: var(--text);
+      font-family: 'DM Sans', sans-serif;
+      min-height: 100vh;
+    }
+
+    /* ── Header ── */
+    header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 14px 32px;
+      border-bottom: 1px solid var(--border);
+      background: rgba(13,15,20,0.9);
+      backdrop-filter: blur(8px);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+
+    .header-left { display: flex; align-items: center; gap: 16px; }
+
+    .header-title {
+      font-family: 'DM Serif Display', serif;
+      font-size: 17px;
+      color: var(--paper);
+    }
+
+    .divider {
+      width: 1px; height: 20px;
+      background: var(--border);
+    }
+
+    .header-sub {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px;
+      color: var(--muted);
+    }
+
+    .back-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 7px 16px;
+      background: var(--slate);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      color: var(--text);
+      font-size: 12px;
+      font-family: 'DM Sans', sans-serif;
+      text-decoration: none;
+      transition: border-color 0.15s, color 0.15s;
+    }
+
+    .back-btn:hover {
+      border-color: rgba(255,255,255,0.25);
+      color: var(--paper);
+    }
+
+    /* ── Intro ── */
+    .intro {
+      max-width: 720px;
+      margin: 48px auto 40px;
+      padding: 0 32px;
+      text-align: center;
+    }
+
+    .intro-label {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      color: var(--accent);
+      margin-bottom: 12px;
+    }
+
+    .intro h1 {
+      font-family: 'DM Serif Display', serif;
+      font-size: 32px;
+      color: var(--paper);
+      line-height: 1.2;
+      margin-bottom: 14px;
+    }
+
+    .intro p {
+      font-size: 14px;
+      line-height: 1.75;
+      color: var(--muted);
+    }
+
+    /* ── Chart grid ── */
+    .charts {
+      max-width: 1100px;
+      margin: 0 auto 80px;
+      padding: 0 32px;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(480px, 1fr));
+      gap: 28px;
+    }
+
+    .chart-card {
+      background: var(--slate);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      overflow: hidden;
+      transition: border-color 0.2s;
+    }
+
+    .chart-card:hover {
+      border-color: rgba(255,255,255,0.15);
+    }
+
+    .chart-card.full-width {
+      grid-column: 1 / -1;
+    }
+
+    .chart-header {
+      padding: 16px 20px 12px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .chart-number {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 10px;
+      color: var(--accent);
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      margin-bottom: 4px;
+    }
+
+    .chart-title {
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--paper);
+    }
+
+    .chart-desc {
+      font-size: 12px;
+      color: var(--muted);
+      margin-top: 4px;
+      line-height: 1.5;
+    }
+
+    .chart-img {
+      width: 100%;
+      display: block;
+    }
+
+    .chart-img img {
+      width: 100%;
+      height: auto;
+      display: block;
+    }
+
+    /* Placeholder for charts not yet added */
+    .chart-placeholder {
+      padding: 40px 20px;
+      text-align: center;
+      color: var(--muted);
+      font-size: 13px;
+      border: 2px dashed var(--border);
+      border-radius: 8px;
+      margin: 16px 20px;
+    }
+
+    .chart-placeholder .icon { font-size: 28px; margin-bottom: 8px; }
+
+    /* ── Footer ── */
+    footer {
+      border-top: 1px solid var(--border);
+      padding: 24px 32px;
+      text-align: center;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px;
+      color: var(--muted);
+    }
+
+    footer a { color: var(--muted); }
+  </style>
+</head>
+<body>
+
+  <header>
+    <div class="header-left">
+      <span class="header-title">Victoria Speed Camera</span>
+      <div class="divider"></div>
+      <span class="header-sub">Statistical Analysis</span>
+    </div>
+    <a href="./index.html" class="back-btn">← Back to map</a>
+  </header>
+
+  <div class="intro">
+    <div class="intro-label">Exploratory Analysis</div>
+    <h1>Speed Cameras &amp; Victorian Suburbs</h1>
+    <p>
+      A series of charts exploring the relationship between speed camera deployment
+      and suburb characteristics — income, schools, crashes, transit access, and more.
+      Data from Vic Gov open data and ABS 2021 Census.
+    </p>
+  </div>
+
+  <div class="charts">
+
+    <!-- Chart 1 -->
+    <div class="chart-card">
+      <div class="chart-header">
+        <div class="chart-number">01</div>
+        <div class="chart-title">Cameras by Median Income Bracket</div>
+        <div class="chart-desc">Are cameras evenly distributed across income levels, or concentrated in wealthier / poorer suburbs?</div>
+      </div>
+      <div class="chart-img">
+        <img src="charts/01_cameras_vs_income.png" alt="Cameras vs income" />
+      </div>
+    </div>
+
+    <!-- Chart 2 -->
+    <div class="chart-card">
+      <div class="chart-header">
+        <div class="chart-number">02</div>
+        <div class="chart-title">Cameras by Number of Schools</div>
+        <div class="chart-desc">Do suburbs with more schools have more cameras? School zones are a common deployment rationale.</div>
+      </div>
+      <div class="chart-img">
+        <img src="charts/02_cameras_vs_schools.png" alt="Cameras vs schools" />
+      </div>
+    </div>
+
+    <!-- Chart 3 -->
+    <div class="chart-card">
+      <div class="chart-header">
+        <div class="chart-number">03</div>
+        <div class="chart-title">Cameras by Crash Count</div>
+        <div class="chart-desc">If cameras were deployed reactively to crash history, we'd expect a strong upward trend here.</div>
+      </div>
+      <div class="chart-img">
+        <img src="charts/03_cameras_vs_crashes.png" alt="Cameras vs crashes" />
+      </div>
+    </div>
+
+    <!-- Chart 4 — full width -->
+    <div class="chart-card full-width">
+      <div class="chart-header">
+        <div class="chart-number">04</div>
+        <div class="chart-title">Cameras vs Public Transit Infrastructure</div>
+        <div class="chart-desc">Four panels — metro lines (with V/Line overlay), tram stops, bus routes, and V/Line access. Does transit-rich = camera-rich?</div>
+      </div>
+      <div class="chart-img">
+        <img src="charts/04_cameras_vs_transit.png" alt="Cameras vs transit" />
+      </div>
+    </div>
+
+    <!-- Chart 5 -->
+    <div class="chart-card">
+      <div class="chart-header">
+        <div class="chart-number">05</div>
+        <div class="chart-title">Cameras vs Car-Free Households</div>
+        <div class="chart-desc">Suburbs with more households without a car may have different camera needs. How does deployment track this?</div>
+      </div>
+      <div class="chart-img">
+        <img src="charts/05_cameras_vs_no_vehicle.png" alt="Cameras vs no vehicle" />
+      </div>
+    </div>
+
+    <!-- Chart 6 -->
+    <div class="chart-card">
+      <div class="chart-header">
+        <div class="chart-number">06</div>
+        <div class="chart-title">Camera Type Mix by Income Bracket</div>
+        <div class="chart-desc">Mobile vs DDS vs Fixed — does the type of enforcement infrastructure vary with suburb income?</div>
+      </div>
+      <div class="chart-img">
+        <img src="charts/06_camera_type_by_income.png" alt="Camera type by income" />
+      </div>
+    </div>
+
+    <!-- Chart 7 -->
+    <div class="chart-card">
+      <div class="chart-header">
+        <div class="chart-number">07</div>
+        <div class="chart-title">Schools vs Crashes</div>
+        <div class="chart-desc">Independent of cameras — do suburbs with more schools also have more crashes? Dot size = suburb population.</div>
+      </div>
+      <div class="chart-img">
+        <img src="charts/07_schools_vs_crashes.png" alt="Schools vs crashes" />
+      </div>
+    </div>
+
+    <!-- Chart 8 -->
+    <div class="chart-card">
+      <div class="chart-header">
+        <div class="chart-number">08</div>
+        <div class="chart-title">Camera Density vs Population Size</div>
+        <div class="chart-desc">Do larger suburbs get proportionally more cameras, or does density thin out as population grows?</div>
+      </div>
+      <div class="chart-img">
+        <img src="charts/08_camera_density_vs_population.png" alt="Camera density vs population" />
+      </div>
+    </div>
+
+  </div>
+
+  <footer>
+    Data: Victorian Government open data · ABS 2021 Census · Crashes 2020–2023 ·
+    <a href="./index.html">← Back to interactive map</a>
+  </footer>
+
+</body>
+</html>

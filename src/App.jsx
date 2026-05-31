@@ -12,6 +12,7 @@ import LGAComparison from './components/LGAComparison'
 import FiltersBar from './components/FiltersBar'
 import SummaryCards from './components/SummaryCards'
 import MapLegend from './components/MapLegend'
+import LandingModal from './components/LandingModal'
 import { CAMERA_TYPES } from './data/config'
 
 const CHART_TABS = [
@@ -46,6 +47,11 @@ export default function App() {
 
   const [chartTab, setChartTab] = useState('effectiveness')
 
+  // Show landing modal unless already seen this session
+  const [showModal, setShowModal] = useState(
+    () => !sessionStorage.getItem('seen_landing')
+  )
+
   const handleCameraTypeChange = (type) => {
     setCameraType(type)
     const match = CAMERA_TYPES.find(c => c.key === type)
@@ -59,7 +65,7 @@ export default function App() {
   }
 
   useEffect(() => {
-    fetch(import.meta.env.BASE_URL + 'suburb-2-vic.geojson')
+    fetch('/suburb-2-vic.geojson')
       .then(r => { if (!r.ok) throw new Error('GeoJSON not found'); return r.json() })
       .then(geo => { setGeoData(geo); setGeoLoading(false) })
       .catch(e => { console.error(e); setGeoLoading(false) })
@@ -315,6 +321,9 @@ export default function App() {
           )}
         </div>
       </div>
+
+      {/* Landing modal */}
+      {showModal && <LandingModal onDismiss={() => setShowModal(false)} />}
     </div>
   )
 }
