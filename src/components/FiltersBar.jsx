@@ -1,5 +1,5 @@
 import React from 'react'
-import { METRICS, CAMERA_TYPES, POP_PRESETS } from '../data/config'
+import { METRICS, METRIC_GROUPS, CAMERA_TYPES, POP_PRESETS } from '../data/config'
 import clsx from 'clsx'
 
 export default function FiltersBar({
@@ -7,9 +7,16 @@ export default function FiltersBar({
   selectedLga, onLgaChange, lgas,
   metroFilter, onMetroFilterChange,
   cameraType, onCameraTypeChange,
+  coverageMode, onCoverageModeChange,
   minPop, onMinPopChange,
   searchQuery, onSearchChange,
 }) {
+  // Group metrics for the dropdown
+  const grouped = METRIC_GROUPS.map(group => ({
+    group,
+    metrics: METRICS.filter(m => m.group === group),
+  }))
+
   return (
     <div className="flex flex-wrap items-center gap-3 px-5 py-3 border-b border-white/10 bg-ink/60 backdrop-blur-sm flex-shrink-0">
 
@@ -31,13 +38,40 @@ export default function FiltersBar({
 
       <div className="w-px h-5 bg-white/10" />
 
-      {/* Map metric */}
+      {/* Coverage mode toggle — cameras/1k vs residents/camera */}
+      <div className="flex items-center gap-2">
+        <span className="text-xs font-mono text-muted uppercase tracking-wider whitespace-nowrap">View</span>
+        <div className="flex items-center gap-0.5 bg-slate rounded-lg p-0.5 border border-white/10">
+          <button onClick={() => onCoverageModeChange('rate')}
+            className={clsx(
+              'text-xs px-2.5 py-1 rounded-md transition-all duration-150 font-medium whitespace-nowrap',
+              coverageMode === 'rate' ? 'bg-accent text-white' : 'text-muted hover:text-paper'
+            )}>
+            Cameras / 1k
+          </button>
+          <button onClick={() => onCoverageModeChange('served')}
+            className={clsx(
+              'text-xs px-2.5 py-1 rounded-md transition-all duration-150 font-medium whitespace-nowrap',
+              coverageMode === 'served' ? 'bg-accent text-white' : 'text-muted hover:text-paper'
+            )}>
+            Residents / Camera
+          </button>
+        </div>
+      </div>
+
+      <div className="w-px h-5 bg-white/10" />
+
+      {/* Map metric — grouped dropdown */}
       <div className="flex items-center gap-2">
         <span className="text-xs font-mono text-muted uppercase tracking-wider whitespace-nowrap">Map</span>
         <select value={metricKey} onChange={e => onMetricChange(e.target.value)}
-          className="text-xs bg-slate border border-white/10 text-paper rounded px-2.5 py-1.5 outline-none cursor-pointer hover:border-accent/50 transition-colors min-w-[200px]">
-          {METRICS.map(m => (
-            <option key={m.key} value={m.key}>{m.label}</option>
+          className="text-xs bg-slate border border-white/10 text-paper rounded px-2.5 py-1.5 outline-none cursor-pointer hover:border-accent/50 transition-colors min-w-[220px]">
+          {grouped.map(({ group, metrics }) => (
+            <optgroup key={group} label={group}>
+              {metrics.map(m => (
+                <option key={m.key} value={m.key}>{m.label}</option>
+              ))}
+            </optgroup>
           ))}
         </select>
       </div>

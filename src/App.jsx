@@ -31,12 +31,13 @@ export default function App() {
   const [geoLoading, setGeoLoading] = useState(true)
 
   // Filters
-  const [metricKey, setMetricKey]     = useState('camerasPer1000')
-  const [selectedLga, setSelectedLga] = useState('All')
-  const [metroFilter, setMetroFilter] = useState('All')
-  const [cameraType, setCameraType]   = useState('all')
-  const [minPop, setMinPop]           = useState(0)
-  const [searchQuery, setSearchQuery] = useState('')
+  const [metricKey, setMetricKey]       = useState('camerasPer1000')
+  const [selectedLga, setSelectedLga]   = useState('All')
+  const [metroFilter, setMetroFilter]   = useState('All')
+  const [cameraType, setCameraType]     = useState('all')
+  const [coverageMode, setCoverageMode] = useState('rate') // 'rate' | 'served'
+  const [minPop, setMinPop]             = useState(0)
+  const [searchQuery, setSearchQuery]   = useState('')
 
   // Selection & compare
   const [selectedSuburb, setSelectedSuburb]   = useState(null)
@@ -48,11 +49,17 @@ export default function App() {
   const handleCameraTypeChange = (type) => {
     setCameraType(type)
     const match = CAMERA_TYPES.find(c => c.key === type)
-    if (match) setMetricKey(match.metricKey)
+    if (match) setMetricKey(coverageMode === 'served' ? match.resMetricKey : match.metricKey)
+  }
+
+  const handleCoverageModeChange = (mode) => {
+    setCoverageMode(mode)
+    const match = CAMERA_TYPES.find(c => c.key === cameraType)
+    if (match) setMetricKey(mode === 'served' ? match.resMetricKey : match.metricKey)
   }
 
   useEffect(() => {
-    fetch(import.meta.env.BASE_URL + 'suburb-2-vic.geojson')
+    fetch('/suburb-2-vic.geojson')
       .then(r => { if (!r.ok) throw new Error('GeoJSON not found'); return r.json() })
       .then(geo => { setGeoData(geo); setGeoLoading(false) })
       .catch(e => { console.error(e); setGeoLoading(false) })
@@ -153,7 +160,13 @@ export default function App() {
           </div>
           {cameraType !== 'all' && (
             <div className="metric-pill bg-accent/20 text-accent">
-              {CAMERA_TYPES.find(c => c.key === cameraType)?.label} cameras
+              {CAMERA_TYPES.find(c => c.key === cameraType)?.label} ·{' '}
+              {coverageMode === 'served' ? 'residents/cam' : 'cams/1k'}
+            </div>
+          )}
+          {cameraType === 'all' && coverageMode === 'served' && (
+            <div className="metric-pill bg-accent/20 text-accent">
+              Residents per camera
             </div>
           )}
         </div>
@@ -198,6 +211,7 @@ export default function App() {
         lgas={lgas}
         metroFilter={metroFilter} onMetroFilterChange={setMetroFilter}
         cameraType={cameraType}   onCameraTypeChange={handleCameraTypeChange}
+        coverageMode={coverageMode} onCoverageModeChange={handleCoverageModeChange}
         minPop={minPop}           onMinPopChange={setMinPop}
         searchQuery={searchQuery} onSearchChange={setSearchQuery}
       />
