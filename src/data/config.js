@@ -43,6 +43,7 @@ export function parseRow(row) {
   const busStops   = num(row['Bus Stops.1'])
   const metroTrain = num(row['Metro Train'])
   const trainLines = num(row['Train Lines'])
+
   const transitScore = calcTransitScore(row)
 
   const mobilePer1k = pop && mobile !== null ? (mobile / pop) * 1000 : null
@@ -62,6 +63,16 @@ export function parseRow(row) {
     ((metroTrain || 0) > 0 ? (trainLines || 1) : 0) +
     ((vlineTrain || 0) > 0 ? 1 : 0)
 
+  // Schools and cameras
+  const schoolsTotal = num(row['Schools_Total'])
+  const schoolsPrimary = num(row['Schools_Primary'])
+  const schoolsSecondary = num(row['Schools_Secondary'])
+  const schoolsGovt = num(row['Schools_Govt'])
+  const schoolsPerCamera = cameras && cameras > 0 && schoolsTotal !== null
+    ? schoolsTotal / cameras : null
+  const camerasPerSchool = schoolsTotal && schoolsTotal > 0 && cameras !== null
+    ? cameras / schoolsTotal : null
+  
   return {
     suburb: (row['Suburb'] || '').trim().toUpperCase(),
     suburbDisplay: toTitleCase((row['Suburb'] || '').trim()),
@@ -71,6 +82,12 @@ export function parseRow(row) {
     dds,
     fixed,
     totalCameras: cameras,
+    schoolsTotal,
+    schoolsPrimary,
+    schoolsSecondary,
+    schoolsGovt,
+    schoolsPerCamera,
+    camerasPerSchool,
     incomeWeekly:     num(row['Median_Personal_Inc_Weekly']),
     genderRatio:      num(row['Gender_Ratio_M_F']),
     vehicles0:        num(row['Vehicles_0']),
@@ -367,10 +384,39 @@ export const METRICS = [
     unit: '/10',
     group: 'Socioeconomic',
   },
+  // ── Schools ────────────────────────────────────────────────────────
+  {
+  key: 'schoolsPerCamera',
+  label: 'Schools per Camera',
+  shortLabel: 'Schools / Camera',
+  colorScale: ['#1a5c38', '#f5f3ee', '#8b0000'],
+  format: v => v?.toFixed(2) ?? '—',
+  unit: 'schools/cam',
+  group: 'Schools & Safety',
+  invertScale: true,
+},
+{
+  key: 'camerasPerSchool',
+  label: 'Cameras per School',
+  shortLabel: 'Cameras / School',
+  colorScale: ['#8b0000', '#f5f3ee', '#1a5c38'],
+  format: v => v?.toFixed(2) ?? '—',
+  unit: 'cams/school',
+  group: 'Schools & Safety',
+},
+{
+  key: 'schoolsTotal',
+  label: 'Total Schools',
+  shortLabel: 'Total Schools',
+  colorScale: ['#1a3a6b', '#f5f3ee', '#c8500a'],
+  format: v => v?.toFixed(0) ?? '—',
+  unit: '',
+  group: 'Schools & Safety',
+},
 ]
 
 // Group metrics for the dropdown
-export const METRIC_GROUPS = ['Coverage rate', 'Population served', 'Camera counts', 'Crash metrics', 'Socioeconomic']
+export const METRIC_GROUPS = ['Coverage rate', 'Population served', 'Camera counts', 'Crash metrics', 'Socioeconomic', 'School & Safety']
 
 export const CAMERA_TYPES = [
   { key: 'all',    label: 'All Types', metricKey: 'camerasPer1000',      resMetricKey: 'residentsPerCamera' },
