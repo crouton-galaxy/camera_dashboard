@@ -59,7 +59,7 @@ export default function App() {
   }
 
   useEffect(() => {
-    fetch('/suburb-2-vic.geojson')
+    fetch(import.meta.env.BASE_URL + 'suburb-2-vic.geojson')
       .then(r => { if (!r.ok) throw new Error('GeoJSON not found'); return r.json() })
       .then(geo => { setGeoData(geo); setGeoLoading(false) })
       .catch(e => { console.error(e); setGeoLoading(false) })

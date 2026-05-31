@@ -8,7 +8,7 @@ export function useSuburbData() {
   const [error, setError] = useState(null)
 
   useEffect(() => {
-    fetch('/data.csv')
+    fetch(import.meta.env.BASE_URL + 'data.csv')
       .then((r) => {
         if (!r.ok) throw new Error('Could not load data.csv')
         return r.text()
