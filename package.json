@@ -2,7 +2,7 @@
   "name": "vic-safety-dashboard",
   "private": true,
   "version": "0.1.0",
-  "homepage": "https://patjibrahim-glitch.github.io/camera_dashboard",
+  "homepage": "https://crouton-galaxy.github.io/camera_dashboard",
   "type": "module",
   "scripts": {
     "dev": "vite",
